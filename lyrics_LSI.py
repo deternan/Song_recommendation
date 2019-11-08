@@ -1,113 +1,80 @@
-# coding=utf8
-
-#
-# LSI (Latent Semantic Indexing)
-#
-# Reference
-# https://github.com/youngmihuang/lyrics_application/blob/master/lyrics_2.ipynb
-#
-
-import matplotlib.pyplot as plt
 import numpy as np
 import jieba.analyse
 import jieba
 import codecs
+
+import logging
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 import os
 from gensim import corpora, models, similarities
 
-jieba.set_dictionary("../jieba/extra_dict/dict.txt.big")
+jiebadataSource = './jieba/extra_dict/'
+dataSource = './data/'
 
-        
-
-# 載入同義字
-# word_net = []
-# with open("../jieba/extra_dict/lyrics_word_net.dataset", "r", encoding = 'utf8') as f1:
-#     for line in f1:
-#         word_net.append(line)
-# 
-# word_net = sorted(set(word_net))
-# word_net_dic = {}
-# 
-# for word in word_net:
-#     word_s = word.split()
-#     word_net_dic[word_s[0]] = word_s[1]
-# 
-# # 將資料處理後的檔案存檔
-# wf = open("../data/lyrics_word_net_mayday.txt", "w", encoding = 'utf8')
-# 
-# with open("../jieba/extra_dict/lyrics_word_net.dataset", "r", encoding = 'utf8') as f2:
-#     for line in f2:
-#         line_words = line.split()
-#         line_lyrics = ""
-#         for line_word in line_words:
-#             if line_word in word_net_dic:
-#                 line_lyrics = line_lyrics + word_net_dic[line_word] + ' '
-#             else:
-#                 line_lyrics = line_lyrics + line_word + ' '        
-#         wf.write(line_lyrics+"\n")
-# 
-# wf.close()
-
-#################################### LSI
 
 # 移除常見字
-with open("../jieba/extra_dict/stop_words.txt", encoding = 'utf8') as f:
+with open(jiebadataSource + "stop_words.txt", encoding = 'utf8') as f:
     stop_word_content = f.readlines()
-stop_word_content = [x.strip() for x in stop_word_content]
+stop_word_content = [x.strip() for x in stop_word_content] #strip: 移除頭尾空格、中間不會
 stop_word_content = " ".join(stop_word_content)
 
 # 建立本次文檔的語料庫(字典)
-# 將文檔裡的詞袋給予編號
-dictionary = corpora.Dictionary(document.split() for document in open("../data/lyrics_word_net_mayday.txt", encoding = 'utf8'))
+dictionary = corpora.Dictionary(document.split() for document in open(dataSource + "lyrics_word_net_mayday.dataset", encoding = 'utf8'))
 stoplist = set(stop_word_content.split())
 stop_ids = [dictionary.token2id[stopword] for stopword in stoplist
-            if stopword in dictionary.token2id]                          #dictionary.token2id: 代表什麼字詞對應到什麼id，有幾個id就代表有幾維向量空間
-dictionary.filter_tokens(stop_ids)                                       # 移除停用字
-dictionary.compactify() #remove faps in id sequence after worfs that were removed
-dictionary.save("../data/lyrics_mayday.dict")
+            if stopword in dictionary.token2id] 
+dictionary.filter_tokens(stop_ids) 
+dictionary.compactify() 
+dictionary.save(dataSource + "lyrics_mayday.dict")
 
-# 查看：序列化的結果
-# for word,index in dictionary.token2id.items(): 
-#     print(word +" id:"+ str(index))
 
 texts = [[word for word in document.split() if word not in stoplist]
-         for document in open("../data/lyrics_word_net_mayday.txt", encoding = 'utf8')]
-
-# 移除只出現一次的字詞
-# from collections import defaultdict
-# frequency = defaultdict(int)
-# for text in texts:
-#     for token in text:
-#         frequency[token] += 1
-
-# texts = [[token for token in text if frequency[token] > 1]
-#          for text in texts]
-
-# 將 corpus 序列化
+         for document in open(dataSource + "lyrics_word_net_mayday.dataset", encoding = 'utf8')]
+         
 corpus = [dictionary.doc2bow(text) for text in texts]
-corpora.MmCorpus.serialize("../data/model/lyrics_mayday.mm", corpus) # Corpus in Matrix Market format 
+corpora.MmCorpus.serialize(dataSource + "model/lyrics_mayday.mm", corpus) 
 
 # 載入語料庫
-if (os.path.exists("../data/lyrics_mayday.dict")):
-    dictionary = corpora.Dictionary.load("../data/lyrics_mayday.dict")
-    corpus = corpora.MmCorpus("../data/model/lyrics_mayday.mm") # 將數據流的語料變為內容流的語料
+if (os.path.exists(dataSource + "lyrics_mayday.dict")):
+    dictionary = corpora.Dictionary.load(dataSource + "lyrics_mayday.dict")
+    corpus = corpora.MmCorpus(dataSource + "model/lyrics_mayday.mm")
     print("Used files generated from first tutorial")
 else:
     print("Please run first tutorial to generate data set")
-
-# 創建 tfidf model
-tfidf = models.TfidfModel(corpus)
-# 轉為向量表示
-corpus_tfidf = tfidf[corpus]
+    
 
 # 創建 LSI model
+tfidf = models.TfidfModel(corpus)
+corpus_tfidf = tfidf[corpus]
 lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=10)
-corpus_lsi = lsi[corpus_tfidf] # LSI潛在語義索引
-lsi.save('../data/model/lyrics_mayday.lsi')
-corpora.MmCorpus.serialize('../data/model/lsi_corpus_mayday.mm', corpus_lsi)
-print("LSI topics:")
-lsi.print_topics(5)
+corpus_lsi = lsi[corpus_tfidf] 
+lsi.save(dataSource + 'model/lyrics_mayday.lsi')
+corpora.MmCorpus.serialize(dataSource + 'model/lsi_corpus_mayday.mm', corpus_lsi)
 
-# 查看：每一首歌在各主題的佔比計算
-for doc in corpus_lsi:
-    print(doc)
+# print("LSI topics:")
+# lsi.print_topics(5)
+
+# Similarity 文本相似度分析
+doc = '如果我們不曾相遇 我會是在哪裡 如果我們從不曾相識 不存在這首歌曲 每秒都活著 每秒都死去 每秒都問著自己 誰不曾找尋 誰不曾懷疑 茫茫人生奔向何地 那一天 那一刻 那個場景 你出現在我生命 從此後 從人生 重新定義 從我故事裡甦醒 如果我們不曾相遇 你又會在哪裡 如果我們從不曾相識 人間又如何運行 曬傷的脫皮 意外的雪景 與你相依的四季 蒼狗又白雲 身旁有了你 匆匆輪迴又有何懼 那一天 那一刻 那個場景 你出現在我生命 每一分 每一秒 每個表情 故事都充滿驚奇 偶然與巧合 舞動了蝶翼 誰的心頭風起 前仆而後繼 萬千人追尋 荒漠唯一菩提 是擦身相遇 或擦肩而去 命運猶如險棋 無數時間線 無盡可能性 終於交織向你 那一天 那一刻 那個場景 你出現在我生命 未知的 未來裡 未定機率 然而此刻擁有你 某一天 某一刻 某次呼吸 我們終將再分離 而我的 自傳裡 曾經有你 沒有遺憾的詩句 詩句裡 充滿感激 如果我們不曾相遇 我會是在哪裡 如果我們從不曾相識 不存在這首歌曲'
+vec_bow = dictionary.doc2bow(doc.split()) 
+vec_lsi = lsi[vec_bow] 
+print(vec_lsi)
+
+# 建立索引
+index = similarities.MatrixSimilarity(lsi[corpus]) 
+index.save(dataSource + "model/lyrics_mayday.index")
+
+# 計算相似度（前五名）
+sims = index[vec_lsi] 
+sims = sorted(enumerate(sims), key=lambda item: -item[1])
+print(sims[:5])
+
+lyrics = [];
+fp = open(dataSource + "lyrics_word_net_mayday.dataset", encoding = 'utf8')
+for i, line in enumerate(fp):
+    lyrics.append(line)
+
+# 結果輸出
+for lyric in sims[:5]:
+    print("\n相似歌詞：",  lyrics[lyric[0]])
+    print("相似度：",  lyric[1])
