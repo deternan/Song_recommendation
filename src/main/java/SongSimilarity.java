@@ -19,7 +19,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.util.ArrayList;
 
-public class word2vec
+public class SongSimilarity
 {
 	FastText fastText_zh;
 	
@@ -29,7 +29,7 @@ public class word2vec
 	private String modelFolder_zh = "cc.zh.Chinese.model";
 	
 	// Read file
-	private String folder = "D:\\Phelps\\GitHub\\Song_recommendation\\data\\";		// Text file folder
+	private String folder = "";		// Text file folder
 	private String file = "lyrics_word_net_mayday.dataset";
 	//private String file = "single_song.txt";										// file name
 	private BufferedReader bfr;	
@@ -44,7 +44,7 @@ public class word2vec
 	private ArrayList<String> termTitle = new ArrayList<String>();
 	
 	
-	private String inputStr = "然後 呢 他們 說 你 的 心 似乎 痊癒 了 也 開始 有 個人 為 你 守護 著 我該 心安 或者 心碎 呢 然後 呢 其實 我 的 日子 也還 可以 呢 除了 回憶 肆虐 的 某些 時刻 慶幸 還有 淚水 沖淡 苦澀 而 那些 昨天 仍 繽紛 著 它們 都 有 我 細心 收藏 著 也許 你還 記得 也許 你 都 忘記 了 也 不是 那 麽 重要 了 只 期待 後來 的 你 能 快樂 那 就是 後來 的 我 最想 的 後來 的 我倆 仍 走著 只是 不再 並肩 了 朝 各自 的 人生 追尋 了 無論是 後來 故事 怎麼 麽 了 也 要 讓 後來 人生 精彩 著 後來 的 我倆 我 期待 著 淚水 中能 看見 你 真的 自由 了 親愛 的 回憶 我倆 共同 走過 的 曲折 是 那些 帶 我倆 來到 了 這 一刻 讓 珍貴 的 人生 有失 有 得 用 新 的 幸福 把 遺憾 包著 就 這 麽 朝著 未來 前進 了 有 再 多 的 不 捨 也 要 狠心 割捨 別 回頭 看 我 親愛 的 只 期待 後來 的 你 能 快樂 那 就是 後來 的 我 最想 的 後來 的 我倆 仍 走著 只是 不再 並肩 了 朝 各自 的 人生 追尋 了 無論是 後來 故事 怎麼 麽 了 也 要 讓 後來 人生 精彩 著 後來 的 我倆 我 期待 著 淚水 中能 看見 你 真的 幸福快樂 在 某處 另 一個 你 留下 了 在 那裏 另 一個 我 微笑 著 另 一個 我倆 還 深愛 著 代表 我倆 永遠 著 如果 能 這 麽 想 就夠 了 無論是 後來 故事 怎麼 麽 了 也 要 讓 後來 人生 值得 後來 的 我倆 我 期待 著 淚水 中能 看見 你 真的 自由 了";
+	private String inputStr = "是 你 的 形影 叫 我 逐天 作眠 夢 夢中 可愛 的 人 伊 不是 別人 我 的 每 一天 一分鐘 也 不當 輕鬆 你 是 阮愛的 人 將阮來 戲弄 九月 的 風 在 吹 那會 寒到 心肝 底 希望 變 無望 決定 我 的 一 世人 I love you 無望 你 甘是 這款 人 沒 法度 來作 陣 也 沒 法度 將我放 I love you 無望 我 就是 這款 人 我 身邊 沒半項 只有 對 你 的 想 陪伴 我 的 每 一天";
 	private double[] inputValue = new double[wordim];
 	private double cosineSimilarity_vale;
 	//private java.util.Vector cosineSimilarity_vale_vec;
@@ -57,7 +57,7 @@ public class word2vec
 	// Sort
 	private ArrayList<Double> termScore = new ArrayList<Double>();
 	
-	public word2vec() throws Exception
+	public SongSimilarity() throws Exception
 	{
 		// load bin		
 			// load model (Chinese)
@@ -185,9 +185,7 @@ public class word2vec
 	}
 		
 	private void Comparison(double[] targetVector, java.util.Vector allValue)
-	{	
-		//cosineSimilarity_vale_vec = new java.util.Vector();
-		
+	{			
 		ArrayList<double[]> tfidfDocsVector = new ArrayList<double[]>();
 		double[] temp;
 		String[] QQ;
@@ -207,14 +205,11 @@ public class word2vec
 			vector_list_2 = tfidfDocsVector.get(j);
 
 			cosineSimilarity_vale = CosineSimilarity(vector_list_1, vector_list_2);
-			if (Double.isNaN(cosineSimilarity_vale)) {
-				//cosineSimilarity_vale_vec.add(0);
+			if (Double.isNaN(cosineSimilarity_vale)) {				
 				termScore.add(0.0);
-			} else {
-				//cosineSimilarity_vale_vec.add(cosineSimilarity_vale);
+			} else {				
 				termScore.add(cosineSimilarity_vale);
-			}
-			//System.out.println(j+" "+cosineSimilarity_vale+"	"+termScore.get(j));
+			}			
 		}
         
 	}
@@ -246,9 +241,7 @@ public class word2vec
 	}
 	
 	private void BubbleSort_ArrayList(ArrayList<Double> arrlist, ArrayList<String> arrlistTitle)
-	{		
-		//ArrayList<Double> arr_sort = new ArrayList<Double>();	//arrlist; 
-				
+	{						
 		double value_temp;
 		String title_temp;
 	
@@ -270,9 +263,9 @@ public class word2vec
 		
 	}
 	
-	public static void main( String[] args ) {
+	public static void main( String[] args) {
 		try {
-			word2vec w2c = new word2vec();
+			SongSimilarity w2c = new SongSimilarity();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
