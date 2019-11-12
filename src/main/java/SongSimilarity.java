@@ -29,7 +29,7 @@ public class SongSimilarity
 	private String modelFolder_zh = "cc.zh.Chinese.model";
 	
 	// Read file
-	private String folder = "";		// Text file folder
+	private String folder = "D:\\Phelps\\GitHub\\Song_recommendation\\data\\";		// Text file folder
 	private String file = "lyrics_word_net_mayday.dataset";
 	//private String file = "single_song.txt";										// file name
 	private BufferedReader bfr;	

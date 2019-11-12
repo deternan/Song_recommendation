@@ -57,7 +57,7 @@ corpora.MmCorpus.serialize(dataSource + 'model/lsi_corpus_mayday.mm', corpus_lsi
 # lsi.print_topics(5)
 
 # Similarity 文本相似度分析
-doc = '想 把 你 寫成 一首歌 想養 一隻 貓 想要 回到 每個 場景 撥慢 每 隻 錶 我倆 在 小孩 和 大人 的 轉角 蓋 一座 城堡 我倆 好好 好 到 瘋 掉 像 找回 失散多年 雙胞 生命 再長 不過 煙火 落下 了 眼角 世界 再大 不過 你 我 凝視 的 微笑 在 所有 流逝 風景 與 人群 中 你 對 我 最好 一切 好好 是否 太好 沒有 人 知道 你 和 我 背著 空蕩 的 書包 逃避 名為 日常 的 監牢 忘記 了 要 長大 忘記 了 要 變老 忘記 了 時間 有腳 最 安靜 的 時刻 回憶 總是 最 喧囂 最 喧囂 的 狂歡 孤單 包圍 著 孤島 還以 為 馴服 想 能 陪伴 我 像 一隻 家貓 它 就 窩 在 沙發 一角 卻 不肯 睡著 你 和 我 曾經 有 滿滿的 羽毛 跳 著名 為 青鳥 的 舞蹈 不 知道 未來 不 知道 煩惱 不知道 那些 日子 會 是 那麼 少 時間 的 電影 結果 才 知道 原來 大人 已經 沒有 童謠 最後 的 叮嚀 最後 的 擁抱 我倆 紅著 眼笑 我倆 都 要 把 自己 照顧 好 好 到 遺憾 無法 打擾 好好 的 生活 好好 的 變老 好好 假裝 我 已經 把 你 忘記 '
+doc = '志明 真正 不知道 要安 怎麼 為 什麼 情人 不願閣 再 相偎 春嬌 已經 早就 無 在 聽 講這多 其實 攏總 攏 無卡 抓 走 到 淡水 的 海岸 兩個 人 的 愛情 已經 無人 看 已經 無人 聽 我 跟 你 最好 就 到 這 你 對 我 已經 沒 感覺 到 這凍止 你 也 免愛我 我 跟 你 最好 就 到 這 你 對 我 已經 沒 感覺 麥閣 傷感 麥閣 我 這愛你 你 沒愛我 志明 心情 真正 有 影寒 風 這大 你 也 真正 攏 沒心肝 春嬌 你 哪無要 和 我播 這 齣 電影 咱 就 走 到 這位 準抵 煞 走 到 淡水 的 海岸 兩個 人 的 愛情 已經 無人 看 已經 無人 聽 我 跟 你 最好 就 到 這 你 對 我 已經 沒 感覺 到 這凍止 你 也 免愛我 我 跟 你 最好 就 到 這 你 對 我 已經 沒 感覺 麥閣 傷感 麥閣 我 這愛你 你 沒愛我 我 跟 你 最好 就 到 這 你 對 我 已經 沒 感覺 到 這凍止 你 也 免愛我 我 跟 你 最好 就 到 這 你 對 我 已經 沒 感覺 麥閣 傷感 麥閣 我 這愛你 你 沒愛我 我 跟 你 最好 就 到 這'
 vec_bow = dictionary.doc2bow(doc.split()) 
 vec_lsi = lsi[vec_bow] 
 print(vec_lsi)
@@ -69,14 +69,15 @@ index.save(dataSource + "model/lyrics_mayday.index")
 # 計算相似度（前五名）
 sims = index[vec_lsi] 
 sims = sorted(enumerate(sims), key=lambda item: -item[1])
-print(sims[:5])
+#print(sims[:11])
 
 lyrics = [];
-fp = open(dataSource + "lyrics_word_net_mayday.dataset", encoding = 'utf8')
+#fp = open(dataSource + "lyrics_word_net_mayday.dataset", encoding = 'utf8')
+fp = open(dataSource + "lyrics_mayday.txt", encoding = 'utf8')
 for i, line in enumerate(fp):
     lyrics.append(line)
 
 # 結果輸出
-for lyric in sims[:5]:
+for lyric in sims[:11]:
     print("\n相似歌詞：",  lyrics[lyric[0]])
     print("相似度：",  lyric[1])
